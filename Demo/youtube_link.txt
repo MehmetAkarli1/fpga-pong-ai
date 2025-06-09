@@ -1,0 +1,3 @@
+Video demonstration of the FPGA pong game on YouTube:
+
+https://youtube.com/shorts/pQKWcvalr9g?feature=share

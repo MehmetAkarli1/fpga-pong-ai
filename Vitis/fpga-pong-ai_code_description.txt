@@ -1,0 +1,52 @@
+This is a description of codes belonging to fpga-pong-ai. It includes description for:
+
+- fpga_pong_ai
+- constants.c
+- constants.h
+- init.c
+- init.h
+
+below is a description of the functions for each code
+
+fpga_pong_ai:
+
+This is the main application file for the Pong game — it’s where everything comes together. 
+It handles game logic, reads input from the player’s paddle via GPIO, and controls the AI paddle based on simple logic that predicts where the ball will be. 
+It talks to a custom Pong IP core using AXI by writing paddle control data and reading game state like ball position, scores, and paddle positions from several registers.
+There’s also a sound system hooked up using BRAM and PWM — whenever the ball hits a paddle, someone scores, or a win/loss happens, a tone or melody is played. 
+The tones and music are preloaded into specific memory regions, and the audio is output using a PWM driver IP block. 
+There's some debug code included too (like LED testing, PWM testing, and audio playback loops) which can be toggled with #if 0.
+
+--------------------------------------------------------------------------
+
+constants.c:
+
+This file defines a 256-sample sine wave array used for audio output through PWM. The idea is to loop through this waveform at a certain speed to generate tones.
+The PWM output is handled in the Vivado block design — so while this file includes the data needed for tone generation,
+the actual tones (like the ones for paddle hits and scoring) aren’t fully implemented from a musical or timing perspective. 
+Right now, it's more of a placeholder to show how sound playback could work, and the audio output is very basic.
+
+--------------------------------------------------------------------------
+
+constants.h:
+
+Contains all the hardware-specific constants and macros used across the project. 
+Defines GPIO base addresses, bit manipulation macros, paddle control bits, game flags, screen size (X_MAX, Y_MAX), and paddle dimensions. 
+Also maps out memory locations in BRAM for different tones and the victory song (“Mary Had a Little Lamb”).
+This header is like the config center for the game — anything tied to hardware or project-wide constants lives here.
+
+--------------------------------------------------------------------------
+
+init.c:
+
+This file includes the hardware initialization routines. init_system() sets up the GPIO driver and runs a self-test to make sure everything’s working. 
+There’s also init_CDMA() for configuring the AXI CDMA engine, although it’s not currently used in the main game code. 
+The CDMA setup includes a config lookup, reset, and a mode check to ensure it’s in simple (non-scatter-gather) mode.
+Both init functions include error messages that print to the terminal and stop execution if something fails, making it easier to debug hardware issues.
+
+--------------------------------------------------------------------------
+
+init.h:
+
+A simple header file that declares the two init functions (init_system() and init_CDMA()), and includes all the necessary headers to keep things modular. 
+Just import this into your main code and you’re good to go with GPIO/CDMA setup.
